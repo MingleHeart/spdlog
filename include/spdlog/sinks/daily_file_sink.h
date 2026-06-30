@@ -104,6 +104,12 @@ protected:
     void sink_it_(const details::log_msg &msg) override {
         auto time = msg.time;
         bool should_rotate = time >= rotation_tp_;
+        if (!should_rotate) {
+            auto expected_filename = FileNameCalc::calc_filename(base_filename_, now_tm(time));
+            if (expected_filename != file_helper_.filename()) {
+                should_rotate = true;
+            }
+        }
         if (should_rotate) {
             auto filename = FileNameCalc::calc_filename(base_filename_, now_tm(time));
             file_helper_.open(filename, truncate_);
